@@ -9,6 +9,10 @@ from TTS.tts.configs.xtts_config import XttsConfig
 from TTS.tts.models.xtts import Xtts
 from pathlib import Path
 
+from TTS.tts.models.xtts import XttsAudioConfig
+from TTS.config.shared_configs import BaseDatasetConfig
+from TTS.tts.models.xtts import XttsArgs
+
 from scripts.modeldownloader import download_model, check_tts_version
 
 from loguru import logger
@@ -125,7 +129,13 @@ class TTSWrapper:
         config.load_json(str(config_path))
 
         self.model = Xtts.init_from_config(config)
+        
+        from torch.serialization import add_safe_globals
+        add_safe_globals([XttsConfig, XttsAudioConfig, BaseDatasetConfig, XttsArgs])  # Добавляем все четыре класса
+  
+        
         self.model.load_checkpoint(config, use_deepspeed=USE_DEEPSPEED,speaker_file_path=speaker_file, checkpoint_dir=str(checkpoint_dir))
+        
         self.model_loaded = True
         self.model.to(self.device)
 

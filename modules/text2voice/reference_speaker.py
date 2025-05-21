@@ -10,6 +10,9 @@ from scripts.funcs import save_audio_to_wav, resample_audio, improve_ref_audio, 
 
 from xtts_webui import *
 
+from pathlib import Path
+import tempfile
+
 # FUNCS
 # SPEAKERS LIST FUNCS
 
@@ -114,7 +117,14 @@ def create_multiple_reference(ref_speakers, use_resample=False, improve_referenc
     # Processing and moving new files.
     processed_files = []
     for index, speaker_file in enumerate(ref_speakers):
-        current_file = Path(speaker_file)
+        #current_file = Path(speaker_file)
+
+        if isinstance(speaker_file, tempfile._TemporaryFileWrapper):
+            current_file = Path(speaker_file.name)  # вытаскиваем реальный путь
+        elif isinstance(speaker_file, (str, os.PathLike)):
+            current_file = Path(speaker_file)
+        else:
+            raise TypeError(f"Unsupported speaker_file type: {type(speaker_file)}")
 
         # Save the original file name without extension
         original_filename = current_file.stem

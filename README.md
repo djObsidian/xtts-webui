@@ -1,23 +1,16 @@
 # XTTS-WebUI
 
-## Portable version
+## Nvidia RTX 50xx Blackwell patch
 
-The project now has a portable version, so you don't have to go to the trouble of installing all the dependencies.
+This fork is a quick fix that brings compatability with CUDA 12.8 and Nvidia Blackwell GPUs.
 
-[Click here to download](https://huggingface.co/daswer123/xtts_portable/resolve/main/xtts-webui-v1_0-portable.zip?download=true)
+### Patch changelog:
 
-You don't need anything but Windows and an Nvidia graphics card with 6 GB of video memory to run it.
+1. Updated installation process and requirements.txt. All credits goes to [@quasiblob](https://github.com/quasiblob), see [his comment](https://github.com/daswer123/xtts-webui/issues/128#issuecomment-2888529586).
+2. Fixed a crash in `create_multiple_reference` by importing `Path` from `pathlib` to handle file path operations properly.
+3. tts_funcs.py: Added imports for `XttsConfig`, `XttsAudioConfig`, `BaseDatasetConfig`, and `XttsArgs` and included them in `add_safe_globals` to resolve `_pickle.UnpicklingError` during model loading with `weights_only=True`.
 
-## The Train tab is broken, if you want to train a model use a separate webui
-## [xtts-finetune-webui](https://github.com/daswer123/xtts-finetune-webui)
 
-## Readme is available in the following languages
-
-[English](https://github.com/daswer123/xtts-webui/blob/main/README.md)
-
-[Russian](https://github.com/daswer123/xtts-webui/blob/main/README_ru_RU.md)
-
-[Português](https://github.com/daswer123/xtts-webui/blob/main/README_pt-BR.md)
 
 ## About the Project
 XTTS-Webui is a web interface that allows you to make the most of XTTS. There are other neural networks around this interface that will improve your results. You can also fine tune the model and get a high quality voice model.
@@ -43,41 +36,66 @@ XTTS-Webui is a web interface that allows you to make the most of XTTS. There ar
 
 ## Installation
 
-Use this web UI through [Google Colab](https://colab.research.google.com/drive/1MrzAYgANm6u79rCCQQqBSoelYGiJ1qYL)
+Tested with Windows 10, Python 3.12, CUDA 12.8, Visual Studio Build Tools 2022. 
 
-**Please ensure you have Python 3.10.x or Python 3.11, CUDA 11.8 or CUDA 12.1 , Microsoft Builder Tools 2019 with c++ package, and ffmpeg installed**
+**Please ensure you have Python >=3.10, CUDA 12.8 , Microsoft Builder Tools 2019 with c++ package, and ffmpeg installed**
 
-### 1 Method, through scripts
+Note: ffmpeg needs to be added in PATH
 
-#### Windows
-To get started:
-- Run 'install.bat' file
-- To start the web UI, run 'start_xtts_webui.bat'
-- Open your preferred browser and go to local address displayed in console.
-- 
-#### Linux
-To get started:
-- Run 'install.sh' file
-- To start the web UI, run 'start_xtts_webui.sh'
-- Open your preferred browser and go to local address displayed in console.
-
-### 2 Method, Manual
+###  Windows manual install
 Follow these steps for installation:
 1. Ensure that `CUDA` is installed
-2. Clone the repository: `git clone https://github.com/daswer123/xtts-webui`
-3. Navigate into the directory: `cd xtts-webui`
-4. Create a virtual environment: `python -m venv venv`
+2. Clone the repository: 
+```
+https://github.com/djObsidian/xtts-webui
+```
+3. Navigate into the directory: 
+```
+cd xtts-webui
+````
+4. Create a virtual environment:
+```
+python -m venv venv
+```
 5. Activate the virtual environment:
-   - On Windows use : `venv\scripts\activate`
-   - On linux use    : `source venv\bin\activate`
+- On Windows use : 
+```
+venv\scripts\activate
+```
 
-6. Install PyTorch and torchaudio with pip command :
+6. Install torch and torchaudio:   
+```
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
+```
 
-   `pip install torch==2.1.1+cu118 torchaudio==2.1.1+cu118 --index-url https://download.pytorch.org/whl/cu118`
+7. Install requirements:
+```
+pip install -r requirements.txt
+```
+8. Install deepspeed:
+- For cmd users:
+```
+set DS_BUILD_AIO=0
+set DS_BUILD_GDS=0
+set DS_BUILD_OPS=0
+set DS_BUILD_EVOFORMER_ATTN=0
+set DS_BUILD_FP_QUANTIZER=0
+```
+- For PowerShell users:
+```
+$Env:DS_BUILD_OPS             = "0"
+$Env:DS_BUILD_AIO             = "0"
+$Env:DS_BUILD_GDS             = "0"
+$Env:DS_BUILD_EVOFORMER_ATTN  = "0"
+$Env:DS_BUILD_FP_QUANTIZER    = "0"
+```
+Then:
+```
+pip install git+https://github.com/microsoft/DeepSpeed.git
+```
 
-7. Install all dependencies from requirements.txt :
 
-    `pip install -r requirements.txt`
+
 
 ## Running The Application
 
@@ -110,7 +128,7 @@ Here are some runtime arguments that can be used when starting the application:
 |-ms,--model-source  	|"local"			|Define the model source: 'api' for latest version from repository, api inference or 'local' for using local inference and model v2.0.2|
 |-v,-version  			|"v2.0.2"				|You can specify which version of xtts to use. You can specify the name of the custom model for this purpose put the folder in models and specify the name of the folder in this flag|
 |--lowvram   		||Enable low vram mode which switches the model to RAM when not actively processing|
-|--deepspeed   		||Enable deepspeed acceleration. Works on windows on python 3.10 and 3.11|
+|--deepspeed   		||Enable deepspeed acceleration. BROKEN DO NOT USE|
 |--share   		 ||Allows sharing of interface outside local computer|
 |--rvc     	 ||Enable RVC post-processing, all models should locate in rvc folder|
 
